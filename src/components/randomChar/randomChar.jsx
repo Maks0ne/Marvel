@@ -1,4 +1,6 @@
 import { Component } from 'react'
+import Spinner from '../spinner/spinner';
+import ErrorMEssage from '../errorMessage/errorMessage';
 import MarvelService from '../../services/marvelService';
 
 
@@ -12,13 +14,25 @@ class RandomChar extends Component {
   }
 
   state = {
-    char: {}
+    char: {},
+    loading: true,
+    error: false,
   };
 
   marvelService = new MarvelService()
 
   onCharLoaded = (char) => {
-    this.setState({ char })
+    this.setState({
+      char,
+      loading: false
+    })
+  }
+
+  onError = () => {
+    this.setState({
+      loading: false,
+      error: true
+    })
   }
 
   updateChar = () => {
@@ -26,29 +40,20 @@ class RandomChar extends Component {
     this.marvelService
       .getCharacters(id)
       .then(this.onCharLoaded)
+      .catch(this.onError)
   }
 
   render() {
-    const { char: { name, description, thumbnail, homepage, wiki } } = this.state
+    const { char, loading, error } = this.state
+    const errorMessage = error ? <ErrorMEssage /> : null;
+    const spinner = loading ? <Spinner /> : null;
+    const content = !(loading || error) ? <View char={char} /> : null
+
     return (
       <div className="randomchar">
-        <div className="randomchar__block">
-          <img src={thumbnail} alt="Random charachter" className='randomchar__img' />
-          <div className="randomchar__info">
-            <p className="randomchar__name">{name}</p>
-            <p className="randomchar__descr">
-              {description}
-            </p>
-            <div className="randomchar__btns">
-              <a href={homepage} className="button button__main">
-                <div className="inner">HOMEPAGE</div>
-              </a>
-              <a href={wiki} className="button button__secondary">
-                <div className="inner">WIKI</div>
-              </a>
-            </div>
-          </div>
-        </div>
+        {errorMessage}
+        {spinner}
+        {content}
         <div className="randomchar__static">
           <p className="randomchar__title">Random character for today!<br />
             Do you want to get to know him better?
@@ -63,5 +68,28 @@ class RandomChar extends Component {
     )
   }
 };
+
+const View = ({ char }) => {
+  const { name, description, homepage, thumbnail, wiki } = char
+  return (
+    < div className="randomchar__block" >
+      <img src={thumbnail} alt="Random charachter" className='randomchar__img' />
+      <div className="randomchar__info">
+        <p className="randomchar__name">{name}</p>
+        <p className="randomchar__descr">
+          {description}
+        </p>
+        <div className="randomchar__btns">
+          <a href={homepage} className="button button__main">
+            <div className="inner">HOMEPAGE</div>
+          </a>
+          <a href={wiki} className="button button__secondary">
+            <div className="inner">WIKI</div>
+          </a>
+        </div>
+      </div>
+    </div >
+  )
+}
 
 export default RandomChar
