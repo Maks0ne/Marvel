@@ -1,4 +1,6 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types'
+
 import Spinner from '../spinner/spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
 import MarvelService from '../../services/marvelService';
@@ -41,7 +43,6 @@ class CharList extends Component {
     handleScroll = (offset) => {
         if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
             this.onRequest(offset);
-            console.log('Scrolling...');
         }
     };
     // onCharListLoaded = (newCharList) => {
@@ -136,5 +137,7 @@ class CharList extends Component {
         )
     }
 }
-
+CharList.propTypes = {
+    onCharSelected: PropTypes.func.isRequired
+  }
 export default CharList;
